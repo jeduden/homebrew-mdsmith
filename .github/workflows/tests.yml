@@ -26,17 +26,30 @@ jobs:
       - name: Set up Homebrew
         uses: Homebrew/actions/setup-homebrew@master
 
+      - name: Create a local tap from this formula
+        # Modern Homebrew refuses to install a loose formula file
+        # ("formulae must be in a tap"), so scaffold a tap and drop the
+        # formula in, then install it by its fully-qualified name.
+        run: |
+          set -euo pipefail
+          git config --global user.email "ci@example.com"
+          git config --global user.name "CI"
+          brew tap-new jeduden/mdsmith
+          tap_dir="$(brew --repository jeduden/mdsmith)"
+          mkdir -p "$tap_dir/Formula"
+          cp Formula/mdsmith.rb "$tap_dir/Formula/mdsmith.rb"
+
       - name: brew style
-        run: brew style Formula/mdsmith.rb
+        run: brew style jeduden/mdsmith/mdsmith
 
       - name: brew install
-        run: brew install --formula --verbose ./Formula/mdsmith.rb
+        run: brew install --verbose jeduden/mdsmith/mdsmith
 
       - name: brew test
-        run: brew test --verbose ./Formula/mdsmith.rb
+        run: brew test --verbose jeduden/mdsmith/mdsmith
 
       - name: brew audit (advisory)
-        run: brew audit --formula --online ./Formula/mdsmith.rb || true
+        run: brew audit --online jeduden/mdsmith/mdsmith || true
 
   scripts:
     name: shellcheck + shfmt
