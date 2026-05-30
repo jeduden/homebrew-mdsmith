@@ -1,0 +1,57 @@
+name: Update formula
+
+# Keeps Formula/mdsmith.rb in step with the latest mdsmith release.
+# Runs on a daily schedule, can be dispatched manually with a specific
+# version, and accepts a repository_dispatch (type: mdsmith-release) so
+# the upstream release pipeline can trigger an immediate bump later.
+on:
+  schedule:
+    - cron: "17 7 * * *"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "mdsmith version to pin (e.g. 0.28.0); blank = latest release"
+        required: false
+        default: ""
+  repository_dispatch:
+    types: [mdsmith-release]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Bump formula to the target mdsmith version
+        id: bump
+        env:
+          VERSION: ${{ github.event.inputs.version || github.event.client_payload.version || '' }}
+        run: scripts/update-formula.sh "$VERSION"
+
+      - name: Open or refresh the bump pull request
+        if: steps.bump.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.bump.outputs.version }}
+        run: |
+          set -euo pipefail
+          branch="automated/bump-mdsmith"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B "$branch"
+          git add Formula/mdsmith.rb
+          git commit -m "mdsmith ${VERSION}"
+          git push -f -u origin "$branch"
+          if [ -n "$(gh pr list --head "$branch" --state open --json number --jq '.[0].number')" ]; then
+            echo "PR for $branch already open; it now points at the refreshed commit."
+          else
+            gh pr create --base main --head "$branch" \
+              --title "mdsmith ${VERSION}" \
+              --body "Automated bump of \`Formula/mdsmith.rb\` to mdsmith ${VERSION}." ||
+              echo "::warning::Branch '$branch' pushed but PR creation failed. Open it manually, or enable 'Allow GitHub Actions to create and approve pull requests' in repository settings."
+          fi
