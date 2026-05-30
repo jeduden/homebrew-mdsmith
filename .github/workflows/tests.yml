@@ -24,20 +24,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Homebrew
+        # In a homebrew-* repository this links the checkout as the
+        # `jeduden/mdsmith` tap, so the formula resolves by name.
         uses: Homebrew/actions/setup-homebrew@master
-
-      - name: Create a local tap from this formula
-        # Modern Homebrew refuses to install a loose formula file
-        # ("formulae must be in a tap"), so scaffold a tap and drop the
-        # formula in, then install it by its fully-qualified name.
-        run: |
-          set -euo pipefail
-          git config --global user.email "ci@example.com"
-          git config --global user.name "CI"
-          brew tap-new jeduden/mdsmith
-          tap_dir="$(brew --repository jeduden/mdsmith)"
-          mkdir -p "$tap_dir/Formula"
-          cp Formula/mdsmith.rb "$tap_dir/Formula/mdsmith.rb"
 
       - name: brew style
         run: brew style jeduden/mdsmith/mdsmith
