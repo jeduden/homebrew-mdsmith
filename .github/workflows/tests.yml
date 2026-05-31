@@ -1,0 +1,64 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  formula:
+    name: brew (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        # macos-latest = arm64 (darwin-arm64), macos-13 = x86_64
+        # (darwin-amd64), ubuntu-latest = x86_64 (linux-amd64).
+        os: [ubuntu-latest, macos-latest, macos-13]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Homebrew
+        # In a homebrew-* repository this links the checkout as the
+        # `jeduden/mdsmith` tap, so the formula resolves by name.
+        uses: Homebrew/actions/setup-homebrew@master
+
+      - name: brew style
+        run: brew style jeduden/mdsmith/mdsmith
+
+      - name: brew install
+        run: brew install --verbose jeduden/mdsmith/mdsmith
+
+      - name: brew test
+        run: brew test --verbose jeduden/mdsmith/mdsmith
+
+      - name: brew audit (advisory)
+        run: brew audit --online jeduden/mdsmith/mdsmith || true
+
+  scripts:
+    name: shellcheck + shfmt
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install shellcheck and shfmt
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck
+          shfmt_version=v3.10.0
+          curl -fsSL -o /tmp/shfmt \
+            "https://github.com/mvdan/sh/releases/download/${shfmt_version}/shfmt_${shfmt_version}_linux_amd64"
+          chmod +x /tmp/shfmt
+          sudo mv /tmp/shfmt /usr/local/bin/shfmt
+
+      - name: shellcheck
+        run: shellcheck scripts/*.sh
+
+      - name: shfmt
+        run: shfmt -d scripts
