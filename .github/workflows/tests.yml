@@ -15,9 +15,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # macos-latest = arm64 (darwin-arm64), macos-13 = x86_64
-        # (darwin-amd64), ubuntu-latest = x86_64 (linux-amd64).
-        os: [ubuntu-latest, macos-latest, macos-13]
+        # ubuntu-latest = linux-amd64, macos-latest = arm64
+        # (darwin-arm64). GitHub retired the free Intel-macOS runner, so
+        # darwin-amd64 is not runtime-tested here; the release checksum
+        # still covers it.
+        os: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
