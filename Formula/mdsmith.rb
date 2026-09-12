@@ -1,28 +1,28 @@
 class Mdsmith < Formula
   desc "Fast Markdown linter and formatter with cross-file integrity checks"
   homepage "https://mdsmith.dev"
-  version "0.27.0"
+  version "0.55.1"
   license "MIT"
 
   on_macos do
     on_arm do
-      url "https://github.com/jeduden/mdsmith/releases/download/v0.27.0/mdsmith-darwin-arm64"
-      sha256 "2040421b2a098d61b6b833a1904af973931babcbfb19330ff402107b7174e2f8"
+      url "https://github.com/jeduden/mdsmith/releases/download/v0.55.1/mdsmith-darwin-arm64"
+      sha256 "78bbf7412431bcc81888bafce2273a9ff15f65ab1c3b3eaa21a47074a83348c7"
     end
     on_intel do
-      url "https://github.com/jeduden/mdsmith/releases/download/v0.27.0/mdsmith-darwin-amd64"
-      sha256 "87b3a661132c74236ca5eda5d0ecdd577d205fc0443dee2ff01ad6069f41c4d5"
+      url "https://github.com/jeduden/mdsmith/releases/download/v0.55.1/mdsmith-darwin-amd64"
+      sha256 "cea18ccd0795c959274a173d93e92e1b3c2e6e626650fdb3c66f653611f51df7"
     end
   end
 
   on_linux do
     on_arm do
-      url "https://github.com/jeduden/mdsmith/releases/download/v0.27.0/mdsmith-linux-arm64"
-      sha256 "8d483827491cf7674f0817a145ae4c7e84ef972d38883911c9f602b9274f9b69"
+      url "https://github.com/jeduden/mdsmith/releases/download/v0.55.1/mdsmith-linux-arm64"
+      sha256 "865791e6154afc5a1769c1fd33855e04e6110079e3f181ad0e3a38ff1b4987de"
     end
     on_intel do
-      url "https://github.com/jeduden/mdsmith/releases/download/v0.27.0/mdsmith-linux-amd64"
-      sha256 "3329edfc0fc019014af3c2a52e5e575f9907e5b5425e0f8aff3b7199e474b3f0"
+      url "https://github.com/jeduden/mdsmith/releases/download/v0.55.1/mdsmith-linux-amd64"
+      sha256 "3fe353cdd2318f72b6a5369aab61be224f9ade3af66be5ba62a0628b5f935468"
     end
   end
 
